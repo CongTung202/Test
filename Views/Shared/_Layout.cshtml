@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="NemeChuaShop - cửa hàng trực tuyến uy tín, chất lượng" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://tungkysie05.id.vn/image/app_icon.png" rel="icon" type="image/x-icon"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/app.extra.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@600&display=swap" rel="stylesheet">
+
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <style>
+        body {
+            background: #f6f7fb;
+            color: #222;
+        }
+
+        main.container {
+            padding-top: 24px;
+            padding-bottom: 48px;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: .4px;
+        }
+
+        .shop-title {
+            font-family: 'Pacifico', cursive;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        /* Hiển thị tên người dùng */
+        .user-welcome {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-right: 1rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #ff6b35;
+        }
+        /* Đảm bảo font tiếng Việt hiển thị đúng */
+        body, .form-control, .btn, .alert {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    @RenderSection("Head", false)
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Header -->
+    @Html.Partial("_Header")
+
+    <!-- Navbar -->
+    @Html.Partial("_Navbar")
+
+    <!-- Banner đầu -->
+
+    <!-- Body tĩnh -->
+    @Html.Partial("_Body")
+
+    <!-- Nội dung động -->
+    <main class="flex-grow-1 container py-4">
+        @RenderBody()
+    </main>
+
+    <!-- Banner cuối -->
+
+
+    <!-- Footer -->
+    @Html.Partial("_Footer")
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/js/site.app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        const music = document.getElementById("background-music");
+        const toggleBtn = document.getElementById("toggleMusic");
+        const musicIcon = document.getElementById("musicIcon");
+
+        let isPlaying = false;
+
+        // Hàm phát nhạc
+        function playMusic() {
+            music.play().then(() => {
+                isPlaying = true;
+                musicIcon.className = "bi bi-volume-up-fill"; // Icon loa mở
+                sessionStorage.setItem("musicState", "playing"); // Lưu trạng thái
+            }).catch(err => {
+                console.log("Autoplay bị chặn:", err);
+            });
+        }
+
+        // Hàm tắt nhạc
+        function pauseMusic() {
+            music.pause();
+            isPlaying = false;
+            musicIcon.className = "bi bi-volume-mute-fill"; // Icon loa tắt
+            sessionStorage.setItem("musicState", "paused"); // Lưu trạng thái
+        }
+
+        // Xử lý khi click vào nút
+        toggleBtn.addEventListener("click", () => {
+            if (isPlaying) {
+                pauseMusic();
+            } else {
+                playMusic();
+            }
+        });
+
+        // Khởi tạo trạng thái khi load trang
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedState = sessionStorage.getItem("musicState");
+
+            if (savedState === "playing") {
+                playMusic();
+            } else {
+                pauseMusic();
+            }
+
+            // Trường hợp autoplay bị chặn, bật nhạc khi user click lần đầu
+            document.addEventListener("click", function firstClick() {
+                if (sessionStorage.getItem("musicState") === "playing" && !isPlaying) {
+                    playMusic();
+                }
+                document.removeEventListener("click", firstClick);
+            });
+
+            // Kiểm tra nếu có thông báo đăng xuất
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('logout') === 'success') {
+                Swal.fire({
+                    title: 'Đăng xuất thành công!',
+                    text: 'Bạn đã đăng xuất khỏi hệ thống',
+                    icon: 'success',
+                    confirmButtonColor: '#ff6b35',
+                    timer: 2000
+                });
+                // Xóa tham số từ URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+        // Kiểm tra trạng thái đăng nhập và hiển thị thông báo chào mừng
+        @if (Context.Session.GetString("ShowWelcome") == "true")
+        {
+                <text>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Lấy tên từ session (đã được encode trong controller)
+                    const hoTen = '@Html.Raw(Context.Session.GetString("HoTen"))';
+
+                    // Hàm decode HTML entities
+                    function decodeHTMLEntities(text) {
+                        const textArea = document.createElement('textarea');
+                        textArea.innerHTML = text;
+                        return textArea.value;
+                    }
+
+                    const decodedHoTen = decodeHTMLEntities(hoTen);
+
+                    Swal.fire({
+                        title: 'Đăng nhập thành công!',
+                        html: `Chào mừng <b>${decodedHoTen}</b> đến với<br>NemeChuaShop`,
+                        icon: 'success',
+                        confirmButtonColor: '#ff6b35',
+                        timer: 2000
+                    });
+
+                    // Đánh dấu đã hiển thị thông báo
+                    fetch('/Account/HideWelcomeMessage', { method: 'POST' });
+                });
+                </text>
+        }
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

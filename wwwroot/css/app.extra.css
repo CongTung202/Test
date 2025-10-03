@@ -1,0 +1,29 @@
+﻿.product - card {
+transition: transform .18s ease, box-shadow .18s ease; border - radius:8px; overflow: hidden; background:#fff; padding:10px; height:100%; display:flex; flex-direction:column; justify-content:space-between;}
+.product - card:hover { transform: translateY(-6px); box - shadow: 0 10px 26px rgba(23,36,56,.08); }
+.product - card.card - img img { width: 100 %; height: 160px; object-fit:cover; display: block; border - radius:6px; }
+.site - toast {
+    position: fixed; right: 20px; bottom: 20px; background: rgba(0, 0, 0, .85); color:#fff; padding:10px 14px; border-radius:8px; opacity:0; transform: translateY(10px); transition: all .25s; z-index:9999; }
+.site - toast.show { opacity: 1; transform: translateY(0); }
+.highlight - update { box - shadow: 0 0 0 3px rgba(255,200,0,0.12); transition: box - shadow .4s ease; }
+.review img { max - width: 200px; border - radius:6px; margin - top:8px; }
+
+/* skeleton */
+.skeleton - card {
+        background:#fff; border-radius:8px; padding:10px; box-shadow: 0 6px 18px rgba(20,20,40,0.04); }
+.skeleton - img {
+            width: 100 %; height: 140px; background: linear - gradient(90deg, #e9eef8, #f6f9ff, #e9eef8); background-size:200% 100%; animation: shimmer 1.4s infinite; border-radius:6px; }
+.skeleton - line {
+                height: 12px; margin - top:10px; background: linear - gradient(90deg, #e9eef8, #f6f9ff, #e9eef8); background-size:200% 100%; animation: shimmer 1.4s infinite; border-radius:6px; }
+.skeleton - line.short { width: 60 %; }
+.skeleton - line.tiny { width: 30 %; height: 10px; }
+
+                    @keyframes shimmer {
+                        0 % { background - position: -200 % 0; }
+                        100 % { background - position: 200 % 0; }
+                    }
+
+                    /* responsive tweaks */
+                    @media(max - width:576px){
+  .product - card.card - img img { height: 140px; }
+                    }

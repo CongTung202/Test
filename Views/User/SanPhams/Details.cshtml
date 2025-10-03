@@ -1,0 +1,393 @@
+﻿@using Microsoft.EntityFrameworkCore
+@model NemeShop.Models.SanPham
+@inject NemeShop.Models.QuanLyTapHoaContext db
+
+<div class="product-detail container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="/">Sản phẩm</a></li>
+            <li class="breadcrumb-item"><a href="/">@Model.MaLoaiNavigation?.TenLoai</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.TenSp</li>
+        </ol>
+    </nav>
+
+    <div class="detail-grid row">
+        <div class="left col-md-6">
+            <div class="product-image-container text-center mb-4">
+                <img id="mainImage" src="@(Model.HinhAnh ?? "/images/placeholder.png")" alt="@Model.TenSp" class="img-fluid rounded-3 main-product-image" />
+            </div>
+
+            <div class="product-meta d-flex justify-content-center gap-4 text-center">
+                <div>
+                    <div class="text-muted small">Tình trạng</div>
+                    <div class="fw-semibold @(Model.SoLuong > 0 ? "text-success" : "text-danger")">
+                        @(Model.SoLuong > 0 ? "Còn hàng" : "Hết hàng")
+                    </div>
+                </div>
+                <div>
+                    <div class="text-muted small">Danh mục</div>
+                    <div class="fw-semibold">@Model.MaLoaiNavigation?.TenLoai</div>
+                </div>
+                <div>
+                    <div class="text-muted small">Mã SP</div>
+                    <div class="fw-semibold">#@Model.MaSp</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right col-md-6">
+            <h1 class="product-title">@Model.TenSp</h1>
+
+            <div class="rating-summary d-flex align-items-center mb-3">
+                @{
+                    var avg = db.DanhGiaSanPhams
+                    .Where(d => d.MaSp == Model.MaSp && d.TrangThai == true)
+                    .Select(d => (double?)d.SoSao)
+                    .Average() ?? 0;
+                    var count = db.DanhGiaSanPhams.Count(d => d.MaSp == Model.MaSp && d.TrangThai == true);
+                }
+                <div class="stars me-2">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <i class="bi @(i <= Math.Round(avg) ? "bi-star-fill text-warning" : "bi-star text-muted")"></i>
+                    }
+                </div>
+                <span class="text-muted">(@count đánh giá)</span>
+                <a href="#reviews" class="ms-3 small">Xem đánh giá</a>
+            </div>
+
+            <div class="price-section mb-4">
+                <p class="price h3 text-primary fw-bold">@String.Format("{0:N0} ₫", Model.DonGia)</p>
+                <div class="text-success small fw-semibold">
+                    <i class="bi bi-truck"></i> Miễn phí vận chuyển cho đơn trên 500.000₫
+                </div>
+            </div>
+
+            <div class="description mb-4">
+                <h5 class="mb-3">Mô tả sản phẩm</h5>
+                <p class="text-muted">@Model.MoTa</p>
+            </div>
+
+            <div class="actions mb-5">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <label class="form-label fw-semibold mb-0">Số lượng:</label>
+                    <div class="quantity-control">
+                        <button class="quantity-btn minus" type="button">-</button>
+                        <input id="qty" type="number" value="1" min="1" max="@Model.SoLuong" class="quantity-input" />
+                        <button class="quantity-btn plus" type="button">+</button>
+                    </div>
+                    <span class="text-muted small">@Model.SoLuong sản phẩm có sẵn</span>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <!-- Nút Mua ngay -->
+                    <button id="btnBuyNow" data-id="@Model.MaSp" class="btn btn-primary btn-lg flex-grow-1">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>Mua ngay
+                    </button>
+
+                    <!-- Nút Yêu thích -->
+                    <button id="btnWishlist" data-id="@Model.MaSp" class="btn btn-outline-danger btn-lg">
+                        <i class="bi bi-heart-fill me-2"></i>Yêu thích
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="product-share">
+                <span class="text-muted me-2">Chia sẻ:</span>
+                <a href="#" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-messenger"></i></a>
+                <a href="#" class="btn btn-sm btn-outline-secondary"><i class="bi bi-link-45deg"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5" />
+
+    <section id="reviews" class="reviews">
+        <h3 class="mb-4">Đánh giá từ khách hàng</h3>
+
+        <div class="row">
+            <div class="col-md-5 col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body text-center">
+                        <div class="display-4 fw-bold text-primary">@Math.Round(avg, 1)</div>
+                        <div class="stars mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="bi @(i <= Math.Round(avg) ? "bi-star-fill text-warning" : "bi-star text-muted")"></i>
+                            }
+                        </div>
+                        <div class="text-muted">Dựa trên @count đánh giá</div>
+                    </div>
+                </div>
+
+                <div class="rating-bars">
+                    @for (int i = 5; i >= 1; i--)
+                    {
+                        var countForStar = db.DanhGiaSanPhams.Count(d => d.MaSp == Model.MaSp && d.TrangThai == true && d.SoSao == i);
+                        var percent = count > 0 ? (countForStar * 100) / count : 0;
+
+                        <div class="rating-bar-item mb-2">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">@i <i class="bi bi-star-fill text-warning"></i></span>
+                                <div class="progress flex-grow-1" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: @percent%;"></div>
+                                </div>
+                                <span class="ms-2 text-muted small">@countForStar</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-7 col-lg-8">
+                <div id="reviewsList">
+                    @if (count > 0)
+                    {
+                        foreach (var r in db.DanhGiaSanPhams
+                        .Include(d => d.MaKhNavigation)
+                        .Where(d => d.MaSp == Model.MaSp && d.TrangThai == true)
+                        .OrderByDescending(d => d.NgayTao))
+                        {
+                            <div class="review card border-0 shadow-sm mb-3">
+                                <div class="card-body">
+                                    <div class="review-head d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-3">
+                                                    <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                        @r.MaKhNavigation?.HoTen?[0]
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <strong>@r.MaKhNavigation?.HoTen</strong>
+                                                    <div class="small text-muted">@r.NgayTao.ToString("dd/MM/yyyy HH:mm")</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="stars-inline">
+                                            @for (int i = 0; i < r.SoSao; i++)
+                                            {
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                            }
+                                            @for (int i = r.SoSao; i < 5; i++)
+                                            {
+                                                <i class="bi bi-star text-muted"></i>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="review-body">@r.NoiDung</div>
+
+                                    @if (r.LaYeuThich)
+                                    {
+                                        <div class="mt-3">
+                                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Yêu thích</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-chat-quote display-4 text-muted"></i>
+                            <h5 class="mt-3 text-muted">Chưa có đánh giá nào</h5>
+                            <p class="text-muted">Hãy là người đầu tiên đánh giá sản phẩm này</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="review-form card mt-5 border-0 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Đánh giá sản phẩm</h4>
+
+                <form id="frmReview" method="post" action="/DanhGiaSanPhams/CreateForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="MaSp" value="@Model.MaSp" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="soSao" class="form-label fw-semibold">Đánh giá của bạn</label>
+                                <div class="star-rating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="bi bi-star-fill me-1" data-rating="@i" style="cursor: pointer; font-size: 1.5rem; color: #dee2e6;"></i>
+                                    }
+                                    <input type="hidden" id="soSao" name="SoSao" value="5" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-semibold">Nội dung đánh giá</label>
+                        <textarea name="NoiDung" class="form-control" rows="4" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" value="true" id="laYeuThich" name="LaYeuThich" />
+                        <label class="form-check-label" for="laYeuThich">
+                            <i class="bi bi-heart-fill text-danger me-1"></i>Tôi yêu thích sản phẩm này
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary px-4 py-2" type="submit">
+                        <i class="bi bi-send me-2"></i>Gửi đánh giá
+                    </button>
+                    <div id="reviewMsg" class="mt-3"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <style>
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+        }
+
+        .main-product-image {
+            max-height: 400px;
+            object-fit: contain;
+        }
+
+        .product-title {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .quantity-control {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .quantity-input {
+            width: 50px;
+            height: 40px;
+            border: none;
+            text-align: center;
+            padding: 0;
+            font-weight: 600;
+        }
+
+        .review {
+            border-radius: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+        }
+
+        .star-rating i {
+            transition: color 0.2s;
+        }
+
+            .star-rating i:hover,
+            .star-rating i.active {
+                color: #ffc107 !important;
+            }
+    </style>
+}
+
+@section Scripts {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/js/site.app.js"></script>
+
+    <script>
+        ProductDetail.init({ productId: @Model.MaSp, addReviewUrl: '/DanhGiaSanPhams/CreateForm' });
+
+        // Điều chỉnh số lượng
+        document.querySelector('.quantity-btn.minus').addEventListener('click', function() {
+            const input = document.getElementById('qty');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        });
+
+        document.querySelector('.quantity-btn.plus').addEventListener('click', function() {
+            const input = document.getElementById('qty');
+            const max = parseInt(input.getAttribute('max')) || 999;
+            if (parseInt(input.value) < max) {
+                input.value = parseInt(input.value) + 1;
+            }
+        });
+
+        // Đánh giá sao
+        const stars = document.querySelectorAll('.star-rating i');
+        const ratingInput = document.getElementById('soSao');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = this.getAttribute('data-rating');
+                ratingInput.value = rating;
+
+                stars.forEach(s => {
+                    if (s.getAttribute('data-rating') <= rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+            });
+
+            star.addEventListener('mouseover', function() {
+                const rating = this.getAttribute('data-rating');
+
+                stars.forEach(s => {
+                    if (s.getAttribute('data-rating') <= rating) {
+                        s.style.color = '#ffc107';
+                    } else {
+                        s.style.color = '#dee2e6';
+                    }
+                });
+            });
+
+            star.addEventListener('mouseout', function() {
+                const currentRating = ratingInput.value;
+
+                stars.forEach(s => {
+                    if (s.getAttribute('data-rating') <= currentRating) {
+                        s.style.color = '#ffc107';
+                    } else {
+                        s.style.color = '#dee2e6';
+                    }
+                });
+            });
+        });
+
+        // Khởi tạo màu sao
+        stars.forEach(s => {
+            if (s.getAttribute('data-rating') <= 5) {
+                s.style.color = '#ffc107';
+            }
+        });
+    </script>
+}

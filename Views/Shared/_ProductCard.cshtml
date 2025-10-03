@@ -1,0 +1,168 @@
+﻿@model NemeShop.Models.SanPham
+
+<div class="product-card" data-id="@Model.MaSp">
+    <div class="product-badges">
+        @if (Model.SoLuong <= 0)
+        {
+            <span class="badge bg-danger">Hết hàng</span>
+        }
+        else if (Model.DonGia < 100000)
+        {
+            <span class="badge bg-success">Giá tốt</span>
+        }
+    </div>
+
+    <div class="card-img">
+        <img loading="lazy" src="@(string.IsNullOrEmpty(Model.HinhAnh) ? "/images/placeholder.png" : Model.HinhAnh)" alt="@Model.TenSp" />
+        <div class="product-overlay">
+            <button class="btn btn-sm btn-icon quick-view" data-id="@Model.MaSp" title="Xem nhanh">
+                <i class="bi bi-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-icon add-to-wishlist" data-id="@Model.MaSp" title="Yêu thích">
+                <i class="bi bi-heart"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="product-category small text-muted mb-1">@Model.MaLoaiNavigation?.TenLoai</div>
+        <h3 class="product-name">@Model.TenSp</h3>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <p class="product-price mb-0">@String.Format("{0:N0} ₫", Model.DonGia)</p>
+
+            <div class="product-actions">
+                <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.MaSp"
+                   class="btn btn-sm btn-outline-secondary">Xem nhanh</a>
+
+                <button class="btn btn-sm btn-primary add-to-cart" data-id="@Model.MaSp">
+                    <i class="bi bi-cart-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="product-stock mt-2">
+            <div class="progress" style="height: 4px;">
+                @{
+                    var stockPercent = Model.SoLuong > 10 ? 100 : Model.SoLuong * 10;
+                }
+                <div class="progress-bar @(Model.SoLuong > 5 ? "bg-success" : "bg-warning")"
+                     role="progressbar" style="width: @stockPercent%;"></div>
+            </div>
+            <small class="text-muted">@(Model.SoLuong > 0 ? $"{Model.SoLuong} sản phẩm có sẵn" : "Hết hàng")</small>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+    .product-badges {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 2;
+    }
+
+    .card-img {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 1/1;
+    }
+
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+    .product-card:hover .card-img img {
+        transform: scale(1.05);
+    }
+
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+        .btn-icon:hover {
+            background: #ff6b35;
+            color: white;
+            transform: scale(1.1);
+        }
+
+    .card-body {
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-name {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 48px;
+    }
+
+    .product-price {
+        color: #ff6b35;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .product-stock {
+        margin-top: auto;
+    }
+</style>

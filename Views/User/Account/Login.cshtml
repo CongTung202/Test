@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="text-center mb-4">
+    <h2 class="card-title">Đăng nhập</h2>
+    <p class="text-muted">Đăng nhập để tiếp tục mua sắm</p>
+</div>
+
+<form method="post" action="/Account/Login">
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input name="email" type="email" class="form-control" required value="@ViewBag.Email" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Mật khẩu</label>
+        <input name="matKhau" type="password" class="form-control" required />
+        <div class="form-text text-end">
+            <a href="#" class="small text-muted">Quên mật khẩu?</a>
+        </div>
+    </div>
+    <button class="btn btn-primary w-100 py-2">Đăng nhập</button>
+
+    <div class="text-center my-4">
+        <span class="text-muted">hoặc</span>
+    </div>
+
+    <div class="d-grid gap-2">
+        <a href="/Account/Register" class="btn btn-outline-secondary">
+            <i class="bi bi-person-plus me-2"></i>Tạo tài khoản mới
+        </a>
+    </div>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-4">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        <span>@ViewBag.Error</span>
+    </div>
+}
+
+@if (ViewBag.SuccessMessage != null)
+{
+    <div class="alert alert-success mt-4">
+        <i class="bi bi-check-circle me-2"></i>
+        <span>@ViewBag.SuccessMessage</span>
+    </div>
+}
+
+@section AuthFooter {
+    <p class="text-muted small">© 2025 NemeChuaShop. Tất cả quyền được bảo lưu.</p>
+}

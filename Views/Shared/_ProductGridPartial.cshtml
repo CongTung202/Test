@@ -1,0 +1,10 @@
+﻿@model IEnumerable<NemeShop.Models.SanPham>
+
+<div class="product-grid">
+    @foreach (var sp in Model)
+    {
+        <div class="product-card-wrapper">
+            @await Html.PartialAsync("_ProductCard", sp)
+        </div>
+    }
+</div>

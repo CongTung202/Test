@@ -1,0 +1,224 @@
+﻿<header>
+    <!-- Thanh MXH + Login + Shop -->
+    <nav class="navbar social-navbar py-1">
+        <div class="container d-flex align-items-center justify-content-between">
+            <!-- MXH + Đăng nhập bên trái -->
+            <div class="d-flex align-items-center">
+                <a href="https://facebook.com" target="_blank" class="nav-link social-icon">
+                    <i class="bi bi-facebook"></i>
+                </a>
+                <a href="https://tiktok.com" target="_blank" class="nav-link social-icon">
+                    <i class="bi bi-tiktok"></i>
+                </a>
+                <a href="https://youtube.com" target="_blank" class="nav-link social-icon">
+                    <i class="bi bi-youtube"></i>
+                </a>
+
+                <div class="vr mx-2 d-none d-md-block"></div>
+
+                @if (!string.IsNullOrEmpty(Context.Session.GetString("MaKh")) || !string.IsNullOrEmpty(Context.Session.GetString("AdminId")))
+                {
+                    <!-- Hiển thị khi đã đăng nhập -->
+                    <div class="dropdown">
+                        <a href="#" class="login-link d-flex align-items-center dropdown-toggle" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>
+                            <span id="userName">@Context.Session.GetString("HoTen")</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text">Xin chào, <strong>@Context.Session.GetString("HoTen")</strong></span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Tài khoản</a></li>
+
+                            @if (!string.IsNullOrEmpty(Context.Session.GetString("MaKh")))
+                            {
+                                <li><a class="dropdown-item" href="/Orders"><i class="bi bi-bag me-2"></i>Đơn hàng của tôi</a></li>
+                            }
+
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-heart me-2"></i>Yêu thích</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="/Account/Logout">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <!-- Hiển thị khi chưa đăng nhập -->
+                    <a asp-controller="Account" asp-action="Login" class="login-link d-flex align-items-center">
+                        <i class="bi bi-person-circle me-1"></i> Đăng nhập
+                    </a>
+                    <a href="/Account/Register" class="login-link d-flex align-items-center ms-2">
+                        <i class="bi bi-person-plus me-1"></i> Đăng ký
+                    </a>
+                }
+            </div>
+
+            <!-- Shop name ở giữa -->
+            <a class="navbar-brand shop-center position-relative" asp-controller="Home" asp-action="Index" id="adminSecret">
+                <h1 class="shop-title mb-0">NemeChuaShop</h1>
+                <small class="tagline d-block text-center text-muted fst-italic">Chất lượng & Uy tín</small>
+                <div id="clickProgress" class="position-absolute bottom-0 start-0" style="display: none; height: 3px; background: linear-gradient(90deg, #ff6b35, #f7931e); width: 0%; transition: width 0.3s;"></div>
+            </a>
+
+            <!-- Giỏ hàng trên thanh header (mobile) -->
+            <div class="d-flex d-lg-none align-items-center">
+                <a href="javascript:void(0)" class="cart-mobile-icon" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                    <i class="bi bi-cart3 fs-5"></i>
+                    <span class="cart-badge" id="cartCountMobile">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<style>
+    .social-icon {
+        transition: transform 0.2s, color 0.2s;
+    }
+
+        .social-icon:hover {
+            transform: translateY(-2px);
+        }
+
+    .bi-facebook:hover {
+        color: #1877f2 !important;
+    }
+
+    .bi-tiktok:hover {
+        color: #000 !important;
+    }
+
+    .bi-youtube:hover {
+        color: #ff0000 !important;
+    }
+
+    .shop-title {
+        font-family: 'Pacifico', cursive;
+        font-size: 28px;
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        transition: all 0.3s ease;
+    }
+
+    #adminSecret:hover .shop-title {
+        transform: scale(1.05);
+    }
+
+    .tagline {
+        font-size: 0.7rem;
+        margin-top: -3px;
+    }
+
+    .cart-mobile-icon {
+        position: relative;
+        color: #ff6b35;
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff6b35;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dropdown-menu {
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        padding: 0.5rem;
+    }
+
+    .dropdown-item {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+    }
+
+        .dropdown-item:hover {
+            background-color: #fff4eb;
+            color: #ff6b35;
+        }
+
+    @@keyframes successPulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const adminSecret = document.getElementById('adminSecret');
+        const clickProgress = document.getElementById('clickProgress');
+        let clickCount = 0;
+        let clickTimeout;
+
+        adminSecret.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            clickCount++;
+
+            // Hiển thị progress bar
+            clickProgress.style.display = 'block';
+            clickProgress.style.width = (clickCount * 10) + '%';
+
+            // Hiệu ứng click
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 100);
+
+            // Reset counter sau 3 giây
+            clearTimeout(clickTimeout);
+            clickTimeout = setTimeout(() => {
+                clickCount = 0;
+                clickProgress.style.width = '0%';
+                setTimeout(() => {
+                    clickProgress.style.display = 'none';
+                }, 300);
+            }, 3000);
+
+            // Kiểm tra khi click đủ 10 lần
+            if (clickCount === 10) {
+                // Hiệu ứng thành công
+                this.style.animation = 'successPulse 0.5s ease-in-out';
+
+                // Thông báo
+                setTimeout(() => {
+                    // Sử dụng SweetAlert2 thay vì alert thông thường
+                    Swal.fire({
+                        title: '✨ Chúc mừng!',
+                        text: 'Bạn đã mở khóa trang Admin!',
+                        icon: 'success',
+                        confirmButtonText: 'Đến trang Admin',
+                        confirmButtonColor: '#ff6b35'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/Admin/Account/Login';
+                        }
+                    });
+                }, 500);
+            }
+        });
+    });
+</script>

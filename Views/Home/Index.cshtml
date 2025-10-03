@@ -1,0 +1,137 @@
+﻿@model IEnumerable<NemeShop.Models.SanPham>
+@inject NemeShop.Models.QuanLyTapHoaContext db
+@{
+    ViewData["Title"] = "Trang Chu";
+}
+
+
+@section Head {
+    <meta name="description" content="Cửa hàng tạp hóa - tìm kiếm, lọc, giỏ hàng realtime" />
+}
+
+<div class="row mb-3 align-items-center">
+    <div class="col-md-5">
+        <div class="input-group">
+            <input id="searchInput" class="form-control form-control-lg" placeholder="Tìm tên sản phẩm, ví dụ: sữa, bánh..." />
+            <button id="searchClear" class="btn btn-light" title="Xóa"><i class="bi bi-x"></i></button>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <select id="categorySelect" class="form-control form-control-lg">
+            <option value="">Tất cả loại</option>
+            @foreach (var l in db.LoaiSanPhams.Where(x => x.TrangThai).OrderBy(x => x.TenLoai))
+            {
+                <option value="@l.MaLoai">@l.TenLoai</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3 d-flex">
+        <input id="priceMin" type="number" class="form-control me-2" placeholder="Giá từ" />
+        <input id="priceMax" type="number" class="form-control" placeholder="Đến" />
+    </div>
+    <div class="col-md-2 text-end">
+        <select id="sortSelect" class="form-control form-control-lg">
+            <option value="popular">Gợi ý</option>
+            <option value="priceAsc">Giá ↑</option>
+            <option value="priceDesc">Giá ↓</option>
+            <option value="newest">Mới nhất</option>
+        </select>
+    </div>
+</div>
+
+<div id="productGrid" class="row g-3">
+    @foreach (var sp in Model)
+    {
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            @await Html.PartialAsync("_ProductCard", sp)
+        </div>
+    }
+</div>
+
+<div id="skeletonGrid" class="row g-3 visually-hidden">
+    @for (int i = 0; i < 8; i++)
+    {
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="skeleton-card">
+                <div class="skeleton-img"></div>
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line tiny"></div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="text-center mt-4">
+    <button id="loadMoreBtn" class="btn btn-outline-primary">Tải thêm</button>
+</div>
+
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div id="quickViewContent" class="modal-body p-3">
+                <div class="text-center py-5">Đang tải ...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        ShopPage.init({
+            searchUrl: '/Home/SearchProducts',
+            productGridSelector: '#productGrid',
+            hubUrl: '/realtime-hub'
+        });
+
+        document.getElementById('searchClear')?.addEventListener('click', ()=> {
+            document.getElementById('searchInput').value = '';
+            ShopPage.search();
+        });
+
+        let currentPage = 1;
+        document.getElementById('loadMoreBtn').addEventListener('click', async ()=>{
+            currentPage++;
+            const grid = document.querySelector('#productGrid');
+            const skeleton = document.getElementById('skeletonGrid');
+            skeleton.classList.remove('visually-hidden');
+            try {
+                const q = encodeURIComponent(document.getElementById('searchInput').value || '');
+                const cat = document.getElementById('categorySelect').value || '';
+                const min = document.getElementById('priceMin').value || '';
+                const max = document.getElementById('priceMax').value || '';
+                const sort = document.getElementById('sortSelect').value || '';
+                const res = await fetch(`/Home/SearchProducts?q=${q}&cat=${cat}&min=${min}&max=${max}&sort=${sort}&page=${currentPage}`);
+                const html = await res.text();
+                const tmp = document.createElement('div'); tmp.innerHTML = html;
+                const partial = tmp.querySelector('.product-grid');
+                if(partial){
+                    const nodes = partial.children;
+                    for(let i=0;i<nodes.length;i++){
+                        const col = document.createElement('div');
+                        col.className = 'col-sm-6 col-md-4 col-lg-3';
+                        col.innerHTML = nodes[i].outerHTML;
+                        grid.appendChild(col);
+                    }
+                }
+            } catch(e){ console.warn(e); }
+            skeleton.classList.add('visually-hidden');
+        });
+
+        document.addEventListener('click', async (e)=>{
+            if (e.target.closest('.quick-view')){
+                const id = e.target.closest('.quick-view').dataset.id;
+                const contentEl = document.getElementById('quickViewContent');
+                contentEl.innerHTML = '<div class="text-center py-5">Đang tải ...</div>';
+                const r = await fetch(`/SanPhams/QuickView/${id}`);
+                if(r.ok){
+                    contentEl.innerHTML = await r.text();
+                    var modal = new bootstrap.Modal(document.getElementById('quickViewModal'));
+                    modal.show();
+                } else {
+                    contentEl.innerHTML = '<div class="text-danger p-4">Không tải được sản phẩm</div>';
+                }
+            }
+        });
+    </script>
+}
