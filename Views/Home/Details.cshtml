@@ -100,82 +100,91 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
+        $(function () {
 
-            // Submit đánh giá (Ajax)
-            $("#review-form").submit(function (e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: '@Url.Action("AddReview", "Home")', // action xử lý lưu review
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    headers: {
-                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function (data) {
-                        $("#review-container").html(data); // reload list review
-                        $("#reviewModal").modal('hide');
-                        $("#review-form")[0].reset();
-                    },
-                    error: function (xhr) {
-                        alert("Có lỗi: " + xhr.status + " " + xhr.statusText);
-                    }
-                });
+            // Thiết lập global: gửi cookie cho Ajax jQuery (thường jQuery gửi cookie theo domain; xhrFields withCredentials an toàn)
+            $.ajaxSetup({
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val()
+                },
+                xhrFields: { withCredentials: true }
             });
 
-                   // Mua ngay (Ajax + Confirm)
-        $("#buyNowForm").submit(function (e) {
-            e.preventDefault();
-            var form = $(this);
+            // Mua ngay (Ajax + confirm bằng SweetAlert2)
+            $("#buyNowForm").on("submit", function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var formData = form.serialize();
 
-            Swal.fire({
-                title: 'Xác nhận mua hàng',
-                text: 'Bạn có chắc muốn mua ngay sản phẩm này không?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Đồng ý',
-                cancelButtonText: 'Hủy',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33'
-            }).then((result) => {
-                if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Xác nhận mua hàng',
+                    text: 'Bạn có chắc muốn mua ngay sản phẩm này không?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33'
+                }).then(function (result) {
+                    if (!result.isConfirmed) return;
+
                     $.ajax({
                         url: '/HoaDon/MuaNgay',
                         type: 'POST',
-                        data: form.serialize(), // gửi dữ liệu từ form
-                        headers: {
-                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                        },
+                        data: formData,
+                        headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val() },
                         xhrFields: { withCredentials: true },
                         success: function (res) {
                             if (res.success) {
                                 Swal.fire({
-                                    title: 'Thành công!',
+                                    title: 'Đặt hàng thành công',
                                     text: res.message,
                                     icon: 'success',
                                     confirmButtonText: 'Xem đơn hàng'
-                                }).then(() => {
-                                    window.location.href = res.redirectUrl; // chuyển đến chi tiết hóa đơn
+                                }).then(function () {
+                                    window.location.href = res.redirectUrl;
                                 });
                             } else {
-                                Swal.fire("Thông báo", res.message, "warning");
+                                Swal.fire('Thông báo', res.message, 'warning');
+                                if (res.message && res.message.toLowerCase().includes('đăng nhập')) {
+                                    // Nếu server trả cần login, mở trang login
+                                    window.location.href = '/Account/Login';
+                                }
                             }
                         },
                         error: function (xhr) {
-                            Swal.fire("Lỗi", "Không thể đặt hàng: " + xhr.statusText, "error");
+                            Swal.fire('Lỗi', 'Có lỗi xảy ra: ' + (xhr.statusText || xhr.status), 'error');
                         }
                     });
-                }
+                });
             });
-        });
 
+            // Review submit (Ajax)
+            $("#review-form").on("submit", function (e) {
+                e.preventDefault();
+                var form = $(this);
+                $.ajax({
+                    url: '@Url.Action("AddReview", "Home")',
+                    type: 'POST',
+                    data: form.serialize(),
+                    headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').first().val() },
+                    xhrFields: { withCredentials: true },
+                    success: function (html) {
+                        $("#review-container").html(html);
+                        $("#reviewModal").modal('hide');
+                        form[0].reset();
+                    },
+                    error: function (xhr) {
+                        Swal.fire('Lỗi', 'Gửi đánh giá thất bại.', 'error');
+                    }
+                });
+            });
 
-            // Yêu thích (chưa có backend, ví dụ tạm)
+            // Wishlist (demo)
             $("#btnWishlist").click(function () {
-                var id = $(this).data("id");
-                alert("Đã thêm sản phẩm #" + id + " vào danh sách yêu thích!");
-                // Có thể gọi Ajax lên server ở đây
+                var id = $(this).data('id');
+                Swal.fire('Yêu thích', 'Đã thêm sản phẩm #' + id + ' vào yêu thích (demo).', 'success');
+                // Gọi Ajax vào backend nếu cần
             });
 
         });

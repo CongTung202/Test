@@ -31,10 +31,18 @@
 
                             @if (!string.IsNullOrEmpty(Context.Session.GetString("MaKh")))
                             {
-                                <li><a class="dropdown-item" href="/Orders"><i class="bi bi-bag me-2"></i>Đơn hàng của tôi</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="/HoaDon/MyOrders">
+                                        <i class="bi bi-receipt me-2"></i>Đơn hàng của tôi
+                                    </a>
+                                </li>
                             }
 
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-heart me-2"></i>Yêu thích</a></li>
+                            <li>
+                                <a class="dropdown-item" href="/Wishlist/MyWishlist">
+                                    <i class="bi bi-heart me-2"></i>Yêu thích
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="/Account/Logout">

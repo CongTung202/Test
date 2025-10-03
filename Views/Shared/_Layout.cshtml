@@ -64,6 +64,7 @@
         }
     </style>
     @RenderSection("Head", false)
+    @RenderSection("Styles", required: false)
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Header -->
@@ -96,59 +97,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        const music = document.getElementById("background-music");
-        const toggleBtn = document.getElementById("toggleMusic");
-        const musicIcon = document.getElementById("musicIcon");
-
-        let isPlaying = false;
-
-        // Hàm phát nhạc
-        function playMusic() {
-            music.play().then(() => {
-                isPlaying = true;
-                musicIcon.className = "bi bi-volume-up-fill"; // Icon loa mở
-                sessionStorage.setItem("musicState", "playing"); // Lưu trạng thái
-            }).catch(err => {
-                console.log("Autoplay bị chặn:", err);
-            });
-        }
-
-        // Hàm tắt nhạc
-        function pauseMusic() {
-            music.pause();
-            isPlaying = false;
-            musicIcon.className = "bi bi-volume-mute-fill"; // Icon loa tắt
-            sessionStorage.setItem("musicState", "paused"); // Lưu trạng thái
-        }
-
-        // Xử lý khi click vào nút
-        toggleBtn.addEventListener("click", () => {
-            if (isPlaying) {
-                pauseMusic();
-            } else {
-                playMusic();
-            }
-        });
-
-        // Khởi tạo trạng thái khi load trang
-        window.addEventListener("DOMContentLoaded", () => {
-            const savedState = sessionStorage.getItem("musicState");
-
-            if (savedState === "playing") {
-                playMusic();
-            } else {
-                pauseMusic();
-            }
-
-            // Trường hợp autoplay bị chặn, bật nhạc khi user click lần đầu
-            document.addEventListener("click", function firstClick() {
-                if (sessionStorage.getItem("musicState") === "playing" && !isPlaying) {
-                    playMusic();
-                }
-                document.removeEventListener("click", firstClick);
-            });
-
-            // Kiểm tra nếu có thông báo đăng xuất
+        document.addEventListener('DOMContentLoaded', function () {
+            // 🔹 Kiểm tra nếu có thông báo đăng xuất
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('logout') === 'success') {
                 Swal.fire({
@@ -158,41 +108,43 @@
                     confirmButtonColor: '#ff6b35',
                     timer: 2000
                 });
-                // Xóa tham số từ URL
+                // Xóa tham số khỏi URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
-        });
 
-        // Kiểm tra trạng thái đăng nhập và hiển thị thông báo chào mừng
-        @if (Context.Session.GetString("ShowWelcome") == "true")
-        {
-                <text>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Lấy tên từ session (đã được encode trong controller)
-                    const hoTen = '@Html.Raw(Context.Session.GetString("HoTen"))';
-
-                    // Hàm decode HTML entities
-                    function decodeHTMLEntities(text) {
-                        const textArea = document.createElement('textarea');
-                        textArea.innerHTML = text;
-                        return textArea.value;
-                    }
-
-                    const decodedHoTen = decodeHTMLEntities(hoTen);
+            // 🔹 Kiểm tra trạng thái đăng nhập và hiển thị thông báo chào mừng
+            @if (Context.Session.GetString("ShowWelcome") == "true")
+            {
+                    <text>
+                    const hoTen = "@Html.Raw(Context.Session.GetString("HoTen") ?? "Khách hàng")";
 
                     Swal.fire({
-                        title: 'Đăng nhập thành công!',
-                        html: `Chào mừng <b>${decodedHoTen}</b> đến với<br>NemeChuaShop`,
-                        icon: 'success',
-                        confirmButtonColor: '#ff6b35',
+                        title: "Đăng nhập thành công!",
+                        html: `Chào mừng <b>${hoTen}</b> đến với<br>NemeChuaShop`,
+                        icon: "success",
+                        confirmButtonColor: "#ff6b35",
                         timer: 2000
                     });
 
-                    // Đánh dấu đã hiển thị thông báo
-                    fetch('/Account/HideWelcomeMessage', { method: 'POST' });
+                    // Gửi request để xóa flag ShowWelcome
+                    fetch("/Account/HideWelcomeMessage", {
+                        method: "POST",
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
+                    });
+                    </text>
+            }
+        });
+
+        // 🔹 Cấu hình sẵn AntiForgeryToken cho tất cả Ajax (jQuery)
+        $(function () {
+            const tokenInput = $("input[name='__RequestVerificationToken']").first();
+            if (tokenInput.length) {
+                $.ajaxSetup({
+                    headers: { "RequestVerificationToken": tokenInput.val() },
+                    xhrFields: { withCredentials: true }
                 });
-                </text>
-        }
+            }
+        });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

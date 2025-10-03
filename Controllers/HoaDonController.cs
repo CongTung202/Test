@@ -16,11 +16,10 @@ namespace NemeShop.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // để khớp với token trong form
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> MuaNgay(int maSp, int soLuong)
         {
-            // Kiểm tra đăng nhập
-            var maKh = HttpContext.Session.GetInt32("MaKh"); // ✅ khớp với SetInt32 bên AccountController
+            var maKh = HttpContext.Session.GetInt32("MaKh");
             if (maKh == null)
             {
                 return Json(new { success = false, message = "Bạn cần đăng nhập để mua ngay." });
@@ -48,7 +47,6 @@ namespace NemeShop.Controllers
             _context.HoaDons.Add(hoaDon);
             await _context.SaveChangesAsync();
 
-            // Tạo chi tiết hóa đơn
             var cthd = new ChiTietHoaDon
             {
                 MaHd = hoaDon.MaHd,
@@ -72,7 +70,6 @@ namespace NemeShop.Controllers
             });
         }
 
-        // Trang chi tiết hóa đơn
         public async Task<IActionResult> Details(int id)
         {
             var hd = await _context.HoaDons
@@ -81,8 +78,59 @@ namespace NemeShop.Controllers
                 .FirstOrDefaultAsync(h => h.MaHd == id);
 
             if (hd == null) return NotFound();
-
             return View(hd);
+        }
+        // Trang "Đơn hàng của tôi"
+        public IActionResult MyOrders()
+        {
+            var maKh = HttpContext.Session.GetInt32("MaKh");
+            if (maKh == null)
+            {
+                // Chưa đăng nhập thì về login
+                return RedirectToAction("Login", "Account");
+            }
+
+            var list = _context.HoaDons
+                .Where(h => h.MaKh == maKh)
+                .OrderByDescending(h => h.NgayLap)
+                .ToList();
+
+            return View(list); // Truyền trực tiếp list sang view
+        }
+
+        // API lấy chi tiết đơn hàng (Ajax)
+        public async Task<IActionResult> GetOrderDetails(int id)
+        {
+            var maKh = HttpContext.Session.GetInt32("MaKh");
+            if (maKh == null)
+            {
+                return Unauthorized("Bạn cần đăng nhập.");
+            }
+
+            var order = await _context.HoaDons
+                .Include(h => h.ChiTietHoaDons)
+                .ThenInclude(ct => ct.MaSpNavigation)
+                .FirstOrDefaultAsync(h => h.MaHd == id && h.MaKh == maKh);
+
+            if (order == null) return NotFound("Không tìm thấy đơn hàng");
+
+            var result = new
+            {
+                order.MaHd,
+                order.NgayLap,
+                order.ThanhTien,
+                order.TrangThai,
+                SanPhams = order.ChiTietHoaDons.Select(ct => new
+                {
+                    TenSp = ct.MaSpNavigation.TenSp,
+                    ct.SoLuong,
+                    ct.DonGia,
+                    ct.ThanhTien,
+                    HinhAnh = ct.MaSpNavigation.HinhAnh ?? "/images/placeholder.png"
+                })
+            };
+
+            return Json(result);
         }
     }
 }

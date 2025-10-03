@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NemeShop.Models;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace NemeShop.Controllers
 {
@@ -13,6 +14,7 @@ namespace NemeShop.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            // Nếu đã đăng nhập thì chuyển về home
             if (HttpContext.Session.GetInt32("MaKh") != null ||
                 !string.IsNullOrEmpty(HttpContext.Session.GetString("AdminId")))
             {
@@ -22,14 +24,15 @@ namespace NemeShop.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string matKhau)
         {
-            // Try customer login first
-            // Login POST
-            var kh = await _context.KhachHangs.FirstOrDefaultAsync(x => x.Email == email && x.MatKhau == matKhau);
+            // Khách hàng
+            var kh = await _context.KhachHangs.FirstOrDefaultAsync(x => x.Email == email && x.MaKh > 0 && x.MatKhau == matKhau);
             if (kh != null)
             {
-                HttpContext.Session.SetInt32("MaKh", kh.MaKh);   // ✅ đổi SetString → SetInt32
+                // STORE MaKh as int
+                HttpContext.Session.SetInt32("MaKh", kh.MaKh);
                 HttpContext.Session.SetString("UserEmail", kh.Email ?? "");
                 HttpContext.Session.SetString("HoTen", WebUtility.HtmlEncode(kh.HoTen) ?? "");
                 HttpContext.Session.SetString("UserRole", "Customer");
@@ -38,7 +41,7 @@ namespace NemeShop.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            // Then try admin login
+            // Admin
             var user = await _context.QuanTriViens.FirstOrDefaultAsync(x => x.Email == email && x.MatKhau == matKhau);
             if (user != null)
             {
@@ -67,10 +70,10 @@ namespace NemeShop.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(string HoTen, string Email, string MatKhau, string DienThoai, string DiaChi)
         {
             var existingEmail = await _context.KhachHangs.FirstOrDefaultAsync(x => x.Email == Email);
-
             if (existingEmail != null)
             {
                 ViewBag.Error = "Email đã được sử dụng. Vui lòng chọn email khác.";
@@ -83,8 +86,7 @@ namespace NemeShop.Controllers
                 return View("~/Views/User/Account/Register.cshtml");
             }
 
-            var newId = _context.KhachHangs.Any()
-                ? _context.KhachHangs.Max(x => x.MaKh) + 1 : 1;
+            var newId = _context.KhachHangs.Any() ? _context.KhachHangs.Max(x => x.MaKh) + 1 : 1;
 
             var khachHang = new KhachHang
             {
@@ -100,14 +102,21 @@ namespace NemeShop.Controllers
             _context.KhachHangs.Add(khachHang);
             await _context.SaveChangesAsync();
 
-            // Đăng nhập ngay sau khi đăng ký
-            HttpContext.Session.SetInt32("MaKh", khachHang.MaKh);   // ✅ đổi SetString → SetInt32
+            // set session as int
+            HttpContext.Session.SetInt32("MaKh", khachHang.MaKh);
             HttpContext.Session.SetString("UserEmail", khachHang.Email ?? "");
             HttpContext.Session.SetString("HoTen", WebUtility.HtmlEncode(khachHang.HoTen) ?? "");
             HttpContext.Session.SetString("UserRole", "Customer");
             HttpContext.Session.SetString("ShowWelcome", "true");
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public IActionResult HideWelcomeMessage()
+        {
+            HttpContext.Session.Remove("ShowWelcome");
+            return Ok();
         }
 
         public IActionResult Logout()

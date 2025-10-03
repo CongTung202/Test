@@ -16,9 +16,11 @@
         <img loading="lazy" src="@(string.IsNullOrEmpty(Model.HinhAnh) ? "/images/placeholder.png" : Model.HinhAnh)" alt="@Model.TenSp" />
         <div class="product-overlay">
             <button class="btn btn-sm btn-icon quick-view" data-id="@Model.MaSp" title="Xem nhanh">
-                <i class="bi bi-eye"></i>
+
+                <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.MaSp"> <i class="bi bi-eye"></i></a>
+                
             </button>
-            <button class="btn btn-sm btn-icon add-to-wishlist" data-id="@Model.MaSp" title="Yêu thích">
+            <button class="btn btn-sm btn-icon add-to-wishlist" data-id="@Model.MaSp" title="Thêm vào yêu thích">
                 <i class="bi bi-heart"></i>
             </button>
         </div>
@@ -33,10 +35,10 @@
 
             <div class="product-actions">
                 <a asp-controller="Home" asp-action="Details" asp-route-id="@Model.MaSp"
-                   class="btn btn-sm btn-outline-secondary">Xem nhanh</a>
+                   class="btn btn-sm btn-outline-secondary">Xem</a>
 
-                <button class="btn btn-sm btn-primary add-to-cart" data-id="@Model.MaSp">
-                    <i class="bi bi-cart-plus"></i>
+                <button class="btn btn-sm btn-icon add-to-wishlist" data-id="@Model.MaSp" title="Thêm vào yêu thích">
+                    <i class="bi bi-heart"></i>
                 </button>
             </div>
         </div>
@@ -166,3 +168,35 @@
         margin-top: auto;
     }
 </style>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".add-to-wishlist").off("click").on("click", function () {
+                var btn = $(this);
+                var spId = btn.data("id");
+
+                $.ajax({
+                    url: "/Wishlist/AddToWishlist",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ MaSp: spId }), // dùng DTO
+                    success: function (res) {
+                        if (res.success) {
+                            btn.find("i").removeClass("bi-heart").addClass("bi-heart-fill text-danger");
+                            Swal.fire("Thành công", res.message, "success");
+                        } else {
+                            Swal.fire("Thông báo", res.message, "info");
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 401) {
+                            Swal.fire("Thông báo", "Vui lòng đăng nhập để thêm sản phẩm vào yêu thích", "warning");
+                        } else {
+                            Swal.fire("Lỗi", "Có lỗi xảy ra. Vui lòng thử lại!", "error");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

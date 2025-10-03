@@ -1,0 +1,38 @@
+﻿@model NemeShop.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Chi tiết hóa đơn";
+}
+
+<div class="container mt-4">
+    <h2>Chi tiết hóa đơn #@Model.MaHd</h2>
+    <p><strong>Khách hàng:</strong> @Model.MaKhNavigation?.HoTen</p>
+    <p><strong>Ngày lập:</strong> @Model.NgayLap.ToString("dd/MM/yyyy HH:mm")</p>
+    <p><strong>Địa chỉ giao hàng:</strong> @Model.DiaChiGiaoHang</p>
+    <p><strong>Điện thoại:</strong> @Model.SdtgiaoHang</p>
+    <p><strong>Tổng tiền:</strong> @String.Format("{0:N0} ₫", Model.TongTien)</p>
+    <p><strong>Thanh toán:</strong> @String.Format("{0:N0} ₫", Model.ThanhTien)</p>
+
+    <h4 class="mt-4">Danh sách sản phẩm</h4>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ChiTietHoaDons)
+            {
+                <tr>
+                    <td>@item.MaSpNavigation?.TenSp</td>
+                    <td>@item.SoLuong</td>
+                    <td>@String.Format("{0:N0} ₫", item.DonGia)</td>
+                    <td>@String.Format("{0:N0} ₫", item.ThanhTien)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

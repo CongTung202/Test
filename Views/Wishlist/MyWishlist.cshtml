@@ -1,0 +1,26 @@
+﻿@model IEnumerable<NemeShop.Models.DanhGiaSanPhamDto>
+
+<div class="container py-4">
+    <h2>Danh sách yêu thích</h2>
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <p class="text-muted">Bạn chưa có sản phẩm nào trong danh sách yêu thích.</p>
+        }
+        else
+        {
+            foreach (var item in Model)
+            {
+                <div class="col-md-3 mb-3">
+                    @Html.Partial("_ProductCard", new SanPham {
+                    MaSp = item.MaSp ?? 0,
+                        TenSp = item.TenSanPham ?? "",
+                        DonGia = 0,
+                        SoLuong = 0,
+                        HinhAnh = "/images/placeholder.png"
+                        })
+        </div>
+                }
+                }
+    </div>
+</div>

@@ -1,0 +1,72 @@
+﻿@model List<NemeShop.Models.HoaDon>
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Đơn hàng của tôi</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        foreach (var o in Model)
+        {
+            <div class="order-card mb-4 shadow-sm rounded-3" data-id="@o.MaHd">
+                <div class="card-header bg-light py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>Mã đơn: #@o.MaHd</strong>
+                            <span class="text-muted ms-3">@o.NgayLap.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                        <span class="order-status badge @(o.TrangThai == 1 ? "bg-success" : "bg-warning")">
+                            @(o.TrangThai == 1 ? "Đã xác nhận" : "Chờ xác nhận")
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <span><strong>Tổng tiền:</strong> @String.Format("{0:N0} ₫", o.ThanhTien)</span>
+                        <button class="btn btn-outline-primary btn-sm view-order-detail" data-id="@o.MaHd">
+                            <i class="bi bi-eye me-1"></i> Xem chi tiết
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> Bạn chưa có đơn hàng nào.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Xem chi tiết đơn hàng
+        document.querySelectorAll('.view-order-detail').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const orderId = this.dataset.id;
+                $.getJSON('/HoaDon/GetOrderDetails', { id: orderId }, function (res) {
+                    let html = `<ul class="list-group">`;
+                    res.sanPhams.forEach(sp => {
+                        html += `<li class="list-group-item d-flex justify-content-between">
+                                    <span>${sp.tenSp} (x${sp.soLuong})</span>
+                                    <span>${sp.thanhTien.toLocaleString()} ₫</span>
+                                 </li>`;
+                    });
+                    html += `</ul>`;
+
+                    Swal.fire({
+                        title: 'Chi tiết đơn hàng #' + res.maHd,
+                        html: html,
+                        icon: 'info',
+                        confirmButtonColor: '#ff6b35'
+                    });
+                }).fail(() => {
+                    Swal.fire("Lỗi", "Không thể tải chi tiết đơn hàng", "error");
+                });
+            });
+        });
+    </script>
+}
