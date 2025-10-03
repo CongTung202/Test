@@ -1,0 +1,53 @@
+﻿@model NemeShop.Models.QuanTriVien
+
+@{
+    ViewData["Title"] = "Chi tiết Quản Trị Viên";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg rounded-3">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-person-badge"></i> @ViewData["Title"]
+            </h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Họ tên</dt>
+                <dd class="col-sm-9">@Model.HoTen</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Mật khẩu</dt>
+                <dd class="col-sm-9">@Model.MatKhau</dd>
+
+                <dt class="col-sm-3">SDT</dt>
+                <dd class="col-sm-9">@Model.DienThoai</dd>
+
+                <dt class="col-sm-3">Địa chỉ</dt>
+                <dd class="col-sm-9">@Model.DiaChi</dd>
+
+                <dt class="col-sm-3">Trạng thái</dt>
+                <dd class="col-sm-9">
+                    @if (Model.TrangThai)
+                    {
+                        <span class="badge bg-success">Hoạt động</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Ngưng</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+            <a asp-action="Edit" asp-route-id="@Model.MaQtv" class="btn btn-warning text-dark">
+                <i class="bi bi-pencil-square"></i> Chỉnh sửa
+            </a>
+        </div>
+    </div>
+</div>

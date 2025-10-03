@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Bảng điều khiển";
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Bảng điều khiển</h2>
+
+    <div class="row g-4">
+        <!-- Sản phẩm -->
+        <div class="col-md-3">
+            <a asp-controller="SanPhams" asp-action="Index" class="text-decoration-none">
+                <div class="card shadow-sm border-0 rounded-3 h-100 hover-shadow">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="me-3 text-primary">
+                            <i class="bi bi-box-seam display-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Sản phẩm</h5>
+                            <p class="card-text fs-4 fw-bold">@ViewBag.TotalSanPham</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Khách hàng -->
+        <div class="col-md-3">
+            <a asp-controller="KhachHangs" asp-action="Index" class="text-decoration-none">
+                <div class="card shadow-sm border-0 rounded-3 h-100 hover-shadow">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="me-3 text-success">
+                            <i class="bi bi-people display-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Khách hàng</h5>
+                            <p class="card-text fs-4 fw-bold">@ViewBag.TotalKhachHang</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Hóa đơn -->
+        <div class="col-md-3">
+            <a asp-controller="HoaDons" asp-action="Index" class="text-decoration-none">
+                <div class="card shadow-sm border-0 rounded-3 h-100 hover-shadow">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="me-3 text-warning">
+                            <i class="bi bi-receipt display-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Hóa đơn</h5>
+                            <p class="card-text fs-4 fw-bold">@ViewBag.TotalHoaDon</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Quản trị viên -->
+        <div class="col-md-3">
+            <a asp-controller="QuanTriViens" asp-action="Index" class="text-decoration-none">
+                <div class="card shadow-sm border-0 rounded-3 h-100 hover-shadow">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="me-3 text-danger">
+                            <i class="bi bi-person-gear display-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Quản trị viên</h5>
+                            <p class="card-text fs-4 fw-bold">@ViewBag.TotalQTV</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15) !important;
+        transform: scale(1.02);
+        transition: all 0.2s ease-in-out;
+    }
+</style>

@@ -1,0 +1,58 @@
+﻿@model IEnumerable<NemeShop.Models.ChiTietHoaDon>
+
+@{
+    ViewData["Title"] = "Danh sách chi tiết hóa đơn";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-list-ul"></i> @ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Thêm mới
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                        <th>Hóa đơn</th>
+                        <th>Sản phẩm</th>
+                        <th class="text-center" style="width:180px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.SoLuong</td>
+                            <td>@String.Format("{0:N0} ₫", item.DonGia)</td>
+                            <td class="fw-bold text-danger">@String.Format("{0:N0} ₫", item.ThanhTien)</td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    HD-@item.MaHdNavigation?.MaHd
+                                </span>
+                                <div class="small text-muted">
+                                    @item.MaHdNavigation?.MaKhNavigation?.HoTen
+                                </div>
+                            </td>
+                            <td>@item.MaSpNavigation?.TenSp</td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.MaCthd" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.MaCthd" class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

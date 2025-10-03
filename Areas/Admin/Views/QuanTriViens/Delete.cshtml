@@ -1,0 +1,51 @@
+﻿@model NemeShop.Models.QuanTriVien
+
+@{
+    ViewData["Title"] = "Xóa Quản Trị Viên";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-danger rounded-3">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="bi bi-trash"></i> @ViewData["Title"]
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning" role="alert">
+                <i class="bi bi-exclamation-triangle"></i>
+                Bạn có chắc chắn muốn xóa quản trị viên này?
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-3">Họ Tên</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.HoTen)</dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+
+                <dt class="col-sm-3">Mật Khẩu</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.MatKhau)</dd>
+
+                <dt class="col-sm-3">SDT</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.DienThoai)</dd>
+
+                <dt class="col-sm-3">Địa Chỉ</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.DiaChi)</dd>
+
+                <dt class="col-sm-3">Trạng Thái</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.TrangThai)</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post" class="mt-3">
+                <input type="hidden" asp-for="MaQtv" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Xóa
+                </button>
+                <a asp-action="Index" class="btn btn-secondary ms-2">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

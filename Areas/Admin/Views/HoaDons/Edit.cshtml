@@ -1,0 +1,128 @@
+﻿@model NemeShop.Models.HoaDonDto
+
+@{
+    ViewData["Title"] = "Sửa hóa đơn";
+}
+
+<h2 class="mb-4">Sửa hóa đơn</h2>
+
+<form id="hoaDonForm">
+    <input type="hidden" asp-for="MaHd" id="MaHd" />
+
+    <div class="form-group mb-3">
+        <label asp-for="MaKh">Khách hàng</label>
+        <select asp-for="MaKh" class="form-control" asp-items="@(ViewData["MaKh"] as SelectList)" id="MaKh">
+            <option value="">-- Chọn khách hàng --</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="MaVoucher">Mã voucher</label>
+        <select asp-for="MaVoucher" class="form-control" asp-items="@(ViewData["MaVoucher"] as SelectList)" id="MaVoucher">
+            <option value="">-- Không dùng --</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="DiaChiGiaoHang">Địa chỉ giao hàng</label>
+        <input asp-for="DiaChiGiaoHang" class="form-control" id="DiaChiGiaoHang" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="SdtgiaoHang">SĐT giao hàng</label>
+        <input asp-for="SdtgiaoHang" class="form-control" id="SdtgiaoHang" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="GhiChu">Ghi chú</label>
+        <input asp-for="GhiChu" class="form-control" id="GhiChu" />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="TongTien">Tổng tiền</label>
+        <input asp-for="TongTien" class="form-control" id="TongTien" readonly />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="TienGiamGia">Tiền giảm</label>
+        <input asp-for="TienGiamGia" class="form-control" id="TienGiamGia" readonly />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="ThanhTien">Thành tiền</label>
+        <input asp-for="ThanhTien" class="form-control" id="ThanhTien" readonly />
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="TrangThai">Trạng thái</label>
+        <select asp-for="TrangThai" class="form-control" id="TrangThai">
+            <option value="0">Chờ xử lý</option>
+            <option value="1">Đã thanh toán</option>
+            <option value="2">Đang giao hàng</option>
+            <option value="3">Đã nhận được hàng</option>
+        </select>
+    </div>
+
+    <button type="button" id="btnSave" class="btn btn-primary">Cập nhật</button>
+</form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Khi chọn voucher sẽ tự tính tiền giảm
+        $("#MaVoucher").change(function () {
+            var maVoucher = $(this).val();
+            var tongTien = parseFloat($("#TongTien").val()) || 0;
+
+            if (!maVoucher) {
+                $("#TienGiamGia").val(0);
+                $("#ThanhTien").val(tongTien);
+                return;
+            }
+
+            $.getJSON('/HoaDons/TinhVoucher', { maVoucher: maVoucher, tongTien: tongTien }, function (res) {
+                if (res.success) {
+                    $("#TienGiamGia").val(res.tienGiam);
+                    $("#ThanhTien").val(res.thanhTien);
+                } else {
+                    alert(res.message);
+                    $("#TienGiamGia").val(0);
+                    $("#ThanhTien").val(tongTien);
+                }
+            });
+        });
+
+        $("#btnSave").click(function () {
+            var dto = {
+                MaHd: parseInt($("#MaHd").val()),
+                MaKh: parseInt($("#MaKh").val()),
+                MaVoucher: $("#MaVoucher").val() || null,
+                DiaChiGiaoHang: $("#DiaChiGiaoHang").val(),
+                SdtgiaoHang: $("#SdtgiaoHang").val(),
+                GhiChu: $("#GhiChu").val(),
+                TongTien: parseFloat($("#TongTien").val()),
+                TienGiamGia: parseFloat($("#TienGiamGia").val()),
+                ThanhTien: parseFloat($("#ThanhTien").val()),
+                TrangThai: parseInt($("#TrangThai").val())
+            };
+
+            $.ajax({
+                url: '/HoaDons/EditAjax',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(dto),
+                success: function (res) {
+                    alert(res.message);
+                    window.location.href = '/HoaDons/Index';
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        alert("Lỗi: " + xhr.responseJSON.errors.join(", "));
+                    } else {
+                        alert("Lỗi: " + xhr.responseJSON.message);
+                    }
+                }
+            });
+        });
+    </script>
+}

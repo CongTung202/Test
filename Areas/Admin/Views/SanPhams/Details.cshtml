@@ -1,0 +1,86 @@
+﻿@model NemeShop.Models.SanPham
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4><i class="bi bi-info-circle-fill me-2"></i> Thông tin chi tiết sản phẩm</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Ảnh sản phẩm -->
+                        <div class="col-md-4 text-center">
+                            @if (!string.IsNullOrEmpty(Model.HinhAnh))
+                            {
+                                <img src="@Url.Content(Model.HinhAnh)" class="img-fluid rounded shadow-sm mb-3" alt="Ảnh sản phẩm" />
+                            }
+                            else
+                            {
+                                <img src="~/images/no-image.png" class="img-fluid rounded shadow-sm mb-3" alt="No Image" />
+                            }
+                        </div>
+
+                        <!-- Thông tin sản phẩm -->
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-4 fw-bold"><i class="bi bi-box-seam me-1"></i> Tên sản phẩm</dt>
+                                <dd class="col-sm-8">@Model.TenSp</dd>
+
+                                <dt class="col-sm-4 fw-bold"><i class="bi bi-card-text me-1"></i> Mô tả</dt>
+                                <dd class="col-sm-8">@Model.MoTa</dd>
+
+                                <dt class="col-sm-4 fw-bold"><i class="bi bi-currency-dollar me-1"></i> Đơn giá</dt>
+                                <dd class="col-sm-8 text-danger fw-bold">@String.Format("{0:N0} ₫", Model.DonGia)</dd>
+
+                                <dt class="col-sm-4 fw-bold"><i class="bi bi-stack me-1"></i> Số lượng</dt>
+                                <dd class="col-sm-8">@Model.SoLuong</dd>
+
+                                <dt class="col-sm-4 fw-bold"><i class="bi bi-tag me-1"></i> Giảm giá</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.PhanTramGiam > 0)
+                                    {
+                                        <span class="badge bg-success">-@Model.PhanTramGiam %</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Không</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4 fw-bold"><i class="bi bi-toggle-on me-1"></i> Trạng thái</dt>
+                                <dd class="col-sm-8">
+                                    @if (Model.TrangThai)
+                                    {
+                                        <span class="badge bg-primary"><i class="bi bi-check-circle"></i> Đang bán</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Ngưng bán</span>
+                                    }
+                                </dd>
+
+                                <dt class="col-sm-4 fw-bold"><i class="bi bi-diagram-3 me-1"></i> Loại sản phẩm</dt>
+                                <dd class="col-sm-8">@Model.MaLoaiNavigation?.TenLoai</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nút hành động -->
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Quay lại
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model?.MaSp" class="btn btn-warning text-white">
+                        <i class="bi bi-pencil-square"></i> Sửa
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,127 @@
+﻿@model NemeShop.Models.HoaDonDto
+
+@{
+    ViewData["Title"] = "Thêm hóa đơn mới";
+}
+
+<h2>Thêm hóa đơn mới</h2>
+
+<form id="createForm">
+    <div class="form-group">
+        <label asp-for="MaKh"></label>
+        <select id="MaKh" asp-for="MaKh" class="form-control" asp-items="ViewBag.MaKh"></select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="MaVoucher"></label>
+        <select id="MaVoucher" asp-for="MaVoucher" class="form-control" asp-items="ViewBag.MaVoucher">
+            <option value="">-- Không dùng voucher --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DiaChiGiaoHang"></label>
+        <input id="DiaChiGiaoHang" asp-for="DiaChiGiaoHang" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SdtgiaoHang"></label>
+        <input id="SdtgiaoHang" asp-for="SdtgiaoHang" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="GhiChu"></label>
+        <textarea id="GhiChu" asp-for="GhiChu" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TongTien"></label>
+        <input id="TongTien" asp-for="TongTien" class="form-control" value="0" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TienGiamGia"></label>
+        <input id="TienGiamGia" asp-for="TienGiamGia" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ThanhTien"></label>
+        <input id="ThanhTien" asp-for="ThanhTien" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TrangThai"></label>
+        <select id="TrangThai" asp-for="TrangThai" class="form-control">
+            <option value="0">Chờ xử lý</option>
+            <option value="1">Đã xác nhận</option>
+            <option value="2">Đang giao hàng</option>
+            <option value="3">Giao Hàng Thành Công</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
+
+@section Scripts {
+    <script>
+        // Khi chọn voucher thì gọi Ajax tính giảm giá
+        $("#MaVoucher, #TongTien").change(function () {
+            var maVoucher = $("#MaVoucher").val();
+            var tongTien = parseFloat($("#TongTien").val());
+
+            if (maVoucher && tongTien > 0) {
+                $.get('@Url.Action("TinhVoucher", "HoaDons")',
+                    { maVoucher: maVoucher, tongTien: tongTien },
+                    function (res) {
+                        if (res.success) {
+                            $("#TienGiamGia").val(res.tienGiam);
+                            $("#ThanhTien").val(res.thanhTien);
+                        } else {
+                            $("#TienGiamGia").val(0);
+                            $("#ThanhTien").val(tongTien);
+                            alert(res.message);
+                        }
+                    });
+            } else {
+                $("#TienGiamGia").val(0);
+                $("#ThanhTien").val(tongTien);
+            }
+        });
+
+        // Submit form Ajax
+        $("#createForm").submit(function (e) {
+            e.preventDefault();
+
+            var formData = {
+                MaKh: $("#MaKh").val(),
+                MaVoucher: $("#MaVoucher").val(),
+                DiaChiGiaoHang: $("#DiaChiGiaoHang").val(),
+                SdtgiaoHang: $("#SdtgiaoHang").val(),
+                GhiChu: $("#GhiChu").val(),
+                TongTien: $("#TongTien").val(),
+                TienGiamGia: $("#TienGiamGia").val(),
+                ThanhTien: $("#ThanhTien").val(),
+                TrangThai: $("#TrangThai").val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("CreateAjax", "HoaDons")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function (res) {
+                    if (res.success) {
+                        alert(res.message);
+                        window.location.href = '@Url.Action("Index", "HoaDons")';
+                    } else {
+                        alert("Lỗi: " + res.message);
+                    }
+                },
+                error: function () {
+                    alert("Đã xảy ra lỗi khi gửi yêu cầu.");
+                }
+            });
+        });
+    </script>
+}

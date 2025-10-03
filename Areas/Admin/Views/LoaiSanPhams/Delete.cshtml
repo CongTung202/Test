@@ -1,0 +1,54 @@
+﻿@model NemeShop.Models.LoaiSanPham
+
+@{
+    ViewData["Title"] = "Xóa loại sản phẩm";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> @ViewData["Title"]</h4>
+                </div>
+                <div class="card-body p-4">
+                    <h5 class="text-danger mb-3">Bạn có chắc chắn muốn xóa loại sản phẩm này?</h5>
+
+                    <dl class="row">
+                        <dt class="col-sm-4 fw-bold">Tên Loại</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.TenLoai)</dd>
+
+                        <dt class="col-sm-4 fw-bold">Mô Tả</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.MoTa)</dd>
+
+                        <dt class="col-sm-4 fw-bold">Trạng Thái</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.TrangThai)
+                            {
+                                <span class="badge bg-success">Đã Nhập Hàng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Đang Nhập Hàng</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Quay lại
+                    </a>
+                    <form asp-action="Delete" class="d-inline">
+                        <input type="hidden" asp-for="MaLoai" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">

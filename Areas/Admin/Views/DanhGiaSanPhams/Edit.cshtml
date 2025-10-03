@@ -1,0 +1,51 @@
+﻿@model NemeShop.Models.DanhGiaUpdateTrangThaiDto
+
+@{
+    ViewData["Title"] = "Sửa trạng thái đánh giá";
+}
+
+<h2>Sửa trạng thái đánh giá</h2>
+
+<form id="editForm">
+    <input type="hidden" asp-for="MaDanhGia" id="MaDanhGia" />
+
+    <div class="mb-3">
+        <label asp-for="TrangThai" class="form-label">Trạng thái</label>
+        <select asp-for="TrangThai" class="form-select">
+            <option value="true">Hiển thị</option>
+            <option value="false">Ẩn</option>
+        </select>
+    </div>
+
+    <button type="button" id="btnSave" class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
+
+@section Scripts {
+<script>
+    $("#btnSave").click(function () {
+        var formData = {
+            MaDanhGia: $("#MaDanhGia").val(),
+            TrangThai: $("#TrangThai").val() === "true"
+        };
+
+        $.ajax({
+            url: '@Url.Action("Edit", "DanhGiaSanPhams")',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (res) {
+                if (res.success) {
+                    alert(res.message);
+                    window.location.href = '@Url.Action("Index", "DanhGiaSanPhams")';
+                } else {
+                    alert("Lỗi: " + res.message);
+                }
+            },
+            error: function () {
+                alert("Có lỗi khi gửi dữ liệu.");
+            }
+        });
+    });
+</script>
+}

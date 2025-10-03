@@ -1,0 +1,89 @@
+﻿@model IEnumerable<NemeShop.Models.DanhGiaSanPham>
+
+@{
+    ViewData["Title"] = "Danh sách đánh giá sản phẩm";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-chat-dots"></i> @ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Thêm mới
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Số sao</th>
+                        <th>Nội dung</th>
+                        <th>Yêu thích</th>
+                        <th>Ngày tạo</th>
+                        <th>Trạng thái</th>
+                        <th>Khách hàng</th>
+                        <th>Sản phẩm</th>
+                        <th class="text-center" style="width:180px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @for (int i = 0; i < item.SoSao; i++)
+                                {
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                }
+                                @for (int i = item.SoSao; i < 5; i++)
+                                {
+                                    <i class="bi bi-star text-muted"></i>
+                                }
+                            </td>
+                            <td>@item.NoiDung</td>
+                            <td>
+                                @if (item.LaYeuThich)
+                                {
+                                    <span class="badge bg-danger"><i class="bi bi-heart-fill"></i> Yêu thích</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary"><i class="bi bi-heart"></i></span>
+                                }
+                            </td>
+                            <td>@item.NgayTao.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (item.TrangThai)
+                                {
+                                    <span class="badge bg-success">Hiển thị</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Ẩn</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge  text-dark">@item.MaKhNavigation?.HoTen</span>
+                            </td>
+                            <td>
+                                <span class="badge text-dark">@item.MaSpNavigation?.TenSp</span>
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.MaDanhGia" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.MaDanhGia" class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.MaDanhGia" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

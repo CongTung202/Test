@@ -1,0 +1,141 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="https://tungkysie05.id.vn/image/app_icon.png" rel="icon" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-size: 0.9rem;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: #343a40;
+            color: #fff;
+        }
+
+            .sidebar .nav-link {
+                color: #adb5bd;
+            }
+
+                .sidebar .nav-link.active,
+                .sidebar .nav-link:hover {
+                    color: #fff;
+                    background-color: #495057;
+                    border-radius: 0.3rem;
+                }
+
+        .content {
+            padding: 20px;
+        }
+
+        .topbar {
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="sidebar p-3">
+            <h4 class="text-white mb-4"><i class="bi bi-speedometer2"></i> Admin</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a asp-controller="Home" asp-action="Index" class="nav-link active">
+                        <i class="bi bi-house-door"></i> Trang chủ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="LoaiSanPhams" asp-action="Index" class="nav-link">
+                        <i class="bi bi-tags"></i> Loại sản phẩm
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="SanPhams" asp-action="Index" class="nav-link">
+                        <i class="bi bi-box"></i> Sản phẩm
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="KhachHangs" asp-action="Index" class="nav-link">
+                        <i class="bi bi-people"></i> Khách hàng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="HoaDons" asp-action="Index" class="nav-link">
+                        <i class="bi bi-receipt"></i> Hóa đơn
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="ChiTietHoaDons" asp-action="Index" class="nav-link">
+                        <i class="bi bi-card-list"></i> Chi tiết hóa đơn
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="DanhGiaSanPhams" asp-action="Index" class="nav-link">
+                        <i class="bi bi-star"></i> Đánh giá
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="QuanTriViens" asp-action="Index" class="nav-link">
+                        <i class="bi bi-person-gear"></i> Quản trị viên
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="MaGiamGiums" asp-action="Index" class="nav-link">
+                        <i class="bi bi-percent"></i> Mã giảm giá
+                    </a>
+                </li>
+            </ul>
+        </nav>
+            <nav class="sidebar p-3">
+                <!-- Menu -->
+            </nav>
+
+            <!-- Main wrapper (Topbar + Content) -->
+            <div class="flex-grow-1 d-flex flex-column">
+                <!-- Topbar -->
+                <div class="topbar d-flex justify-content-between align-items-center">
+                    @if (Context.Session.GetString("UserEmail") != null)
+                    {
+                        <span class="fw-bold">Xin chào, @Context.Session.GetString("UserEmail")</span>
+                        <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </a>
+                    }
+                    else
+                    {
+                        <div>
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
+                            </a>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-person-plus"></i> Đăng ký
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <!-- Content -->
+                <main class="content flex-grow-1">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

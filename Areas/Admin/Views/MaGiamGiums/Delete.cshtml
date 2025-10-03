@@ -1,0 +1,67 @@
+﻿@model NemeShop.Models.MaGiamGium
+
+@{
+    ViewData["Title"] = "Xóa mã giảm giá";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg rounded-3 border-danger">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-trash"></i> Xóa mã giảm giá
+            </h4>
+        </div>
+        <div class="card-body">
+            <h5 class="text-danger mb-3">Bạn có chắc chắn muốn xóa voucher này không?</h5>
+            <dl class="row">
+                <dt class="col-sm-3">Tên voucher</dt>
+                <dd class="col-sm-9">@Model.TenVoucher</dd>
+
+                <dt class="col-sm-3">Mô tả</dt>
+                <dd class="col-sm-9">@Model.MoTa</dd>
+
+                <dt class="col-sm-3">Phần trăm giảm</dt>
+                <dd class="col-sm-9">@Model.PhanTramGiam %</dd>
+
+                <dt class="col-sm-3">Giảm tiền trực tiếp</dt>
+                <dd class="col-sm-9">@Model.GiamTienTrucTiep?.ToString("N0") đ</dd>
+
+                <dt class="col-sm-3">Giá trị đơn tối thiểu</dt>
+                <dd class="col-sm-9">@Model.GiaTriDonToiThieu?.ToString("N0") đ</dd>
+
+                <dt class="col-sm-3">Số lượng</dt>
+                <dd class="col-sm-9">@Model.SoLuong</dd>
+
+                <dt class="col-sm-3">Đã sử dụng</dt>
+                <dd class="col-sm-9">@Model.DaSuDung</dd>
+
+                <dt class="col-sm-3">Ngày bắt đầu</dt>
+                <dd class="col-sm-9">
+                    @(Model.NgayBatDau != null
+                                        ? Model.NgayBatDau.ToString("dd/MM/yyyy HH:mm")
+                                        : "Chưa có")
+                </dd>
+
+                <dt class="col-sm-3">Ngày kết thúc</dt>
+                <dd class="col-sm-9">
+                    @(Model.NgayKetThuc != null
+                                        ? Model.NgayKetThuc.ToString("dd/MM/yyyy HH:mm")
+                                        : "Chưa có")
+                </dd>
+
+                <dt class="col-sm-3">Trạng thái</dt>
+                <dd class="col-sm-9">@Model.TrangThai</dd>
+            </dl>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="MaVoucher" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Xóa
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
